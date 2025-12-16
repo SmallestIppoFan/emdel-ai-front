@@ -144,7 +144,7 @@ POST /api/chat
 
 ## Дополнительная информация
 
-- Документация API: http://localhost:8000/docs
 - Репозиторий бэкенда: https://github.com/SmallestIppoFan/emdel-ai-python-backend
 - README бэкенда содержит подробную информацию о структуре проекта
+
 
