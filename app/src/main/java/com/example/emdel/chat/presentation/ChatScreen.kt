@@ -1,5 +1,9 @@
 package com.example.emdel.chat.presentation
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +23,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -42,6 +47,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -138,6 +144,8 @@ fun ChatScreen(
 
 @Composable
 fun MessageBubble(message: com.example.emdel.domain.model.ChatMessage) {
+    val context = LocalContext.current
+    
     Column(
         modifier = Modifier
             .fillMaxWidth(),
@@ -178,7 +186,10 @@ fun MessageBubble(message: com.example.emdel.domain.model.ChatMessage) {
                         .fillMaxWidth()
                 ) {
                     clinics.forEach { clinic ->
-                        ClinicCard(clinic = clinic)
+                        ClinicCard(
+                            clinic = clinic,
+                            onOpenMap = { open2Gis(context, clinic) }
+                        )
                         Spacer(modifier = Modifier.size(8.dp))
                     }
                 }
@@ -189,7 +200,8 @@ fun MessageBubble(message: com.example.emdel.domain.model.ChatMessage) {
 
 @Composable
 private fun ClinicCard(
-    clinic: Clinic
+    clinic: Clinic,
+    onOpenMap: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -228,7 +240,35 @@ private fun ClinicCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+
+            Spacer(modifier = Modifier.size(8.dp))
+
+            Button(
+                onClick = onOpenMap,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("Показать на карте")
+            }
         }
+    }
+}
+
+private fun open2Gis(context: android.content.Context, clinic: Clinic) {
+    val address = clinic.address
+    if (address.isBlank()) {
+        Toast.makeText(context, "Адрес клиники не указан", Toast.LENGTH_SHORT).show()
+        return
+    }
+
+    // Открываем поиск в 2ГИС через браузер
+    val encoded = java.net.URLEncoder.encode(address, "UTF-8")
+    val uri = Uri.parse("https://2gis.kz/search/$encoded")
+    val intent = Intent(Intent.ACTION_VIEW, uri)
+    try {
+        context.startActivity(intent)
+    } catch (e: ActivityNotFoundException) {
+        Toast.makeText(context, "Не удалось открыть карту 2ГИС", Toast.LENGTH_SHORT).show()
     }
 }
 
