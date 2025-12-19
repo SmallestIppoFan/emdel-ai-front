@@ -5,7 +5,7 @@
 ### 1. Клонирование репозитория бэкенда
 
 ```bash
-git clone https://github.com/SmallestIppoFan/emdel-ai-python-backend.git
+git clone https://github.com/amirslanbek02/emdel-ai-python-backend.git
 cd emdel-ai-python-backend
 ```
 
